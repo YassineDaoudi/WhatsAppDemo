@@ -9,7 +9,6 @@ import UIKit
 import Firebase
 import SVProgressHUD
 
-
 class RegisterViewController: UIViewController {
 
     

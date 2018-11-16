@@ -34,6 +34,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        title = Auth.auth().currentUser?.email
+        
         messageTableView.backgroundView = UIImageView(image: UIImage(named: "chat-backgroundImage"))
         
         //TODO: Set yourself as the delegate and datasource here:
@@ -72,18 +74,18 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
         cell.messageBody.text = messageArray[indexPath.row].messageBody
-        cell.senderUsername.text = messageArray[indexPath.row].sender
         cell.messageTameLabel.text = messageArray[indexPath.row].time
-        cell.avatarImageView.image = UIImage(named: "phoenix")
+        //cell.avatarImageView.image = UIImage(named: "phoenix")
         cell.setTransparent()
-        if cell.senderUsername.text == Auth.auth().currentUser?.email{
-            
-            //Messages we sent
-            
-            cell.messageBackground.backgroundColor = UIColor.flatGreenColorDark()
-        } else {
-            cell.messageBackground.backgroundColor = UIColor.flatWhiteColorDark()
-        }
+        cell.messageBackground.backgroundColor = UIColor.flatWhiteColorDark()
+//        if cell.senderUsername.text == Auth.auth().currentUser?.email{
+//
+//            //Messages we sent
+//
+//
+//        } else {
+//            cell.messageBackground.backgroundColor = UIColor.flatWhiteColorDark()
+//        }
         
         return cell
     }
@@ -103,7 +105,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     //TODO: Declare configureTableView here:
     func configureTableView() {
-        messageTableView.rowHeight = UITableViewAutomaticDimension
+        messageTableView.rowHeight = UITableView.automaticDimension
         messageTableView.estimatedRowHeight = 120.0
     }
     
@@ -117,7 +119,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     //TODO: Declare textFieldDidBeginEditing here:
     func textFieldDidBeginEditing(_ textField: UITextField) {
     sendButton.setImage(nil, for: .normal)
-    sendButton.setTitle("Send", for: UIControlState.normal)
+    sendButton.setTitle("Send", for: UIControl.State.normal)
     cameraState = false
      UIView.animate(withDuration: 0.5) {
             self.heightConstraint.constant = 308
@@ -129,8 +131,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     //TODO: Declare textFieldDidEndEditing here:
     func textFieldDidEndEditing(_ textField: UITextField) {
-        sendButton.setImage(UIImage(named: "black_photo_btn"), for: UIControlState.normal)
-        sendButton.setTitle("", for: UIControlState.normal)
+        sendButton.setImage(UIImage(named: "black_photo_btn"), for: UIControl.State.normal)
+        sendButton.setTitle("", for: UIControl.State.normal)
         cameraState = true
         UIView.animate(withDuration: 0.5) {
             self.heightConstraint.constant = 50
@@ -189,7 +191,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             imagePickerController.delegate = self
             
-            imagePickerController.sourceType = UIImagePickerControllerSourceType.camera
+            imagePickerController.sourceType = UIImagePickerController.SourceType.camera
             
             imagePickerController.allowsEditing = true
             

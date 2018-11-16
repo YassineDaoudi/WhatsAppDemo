@@ -17,6 +17,11 @@ class CustomChatCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        senderAvatar.layer.borderWidth = 1
+        senderAvatar.layer.masksToBounds = false
+        senderAvatar.layer.borderColor = UIColor.black.cgColor
+        senderAvatar.layer.cornerRadius = senderAvatar.frame.height/2
+        senderAvatar.clipsToBounds = true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

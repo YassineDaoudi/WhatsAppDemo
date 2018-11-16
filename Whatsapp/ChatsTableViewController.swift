@@ -7,26 +7,59 @@
 
 import UIKit
 import Firebase
+import ChameleonFramework
 
 class ChatsTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,UISearchBarDelegate {
 
-    // Declare instance variables here
-    var chatsArray: [ChatRoom] = [ChatRoom]()
+    //MARK: -Declare instance variables here
+    var chatsArray:[ChatRoom] = [ChatRoom]()
     var searchActive : Bool = false
     var filtered:[ChatRoom] = []
-
+    let searchController = UISearchController(searchResultsController: nil)
+    private lazy var toolBar: UIToolbar = {
+        return UIToolbar()
+    }()
+    private var toolBarConstraints = [NSLayoutConstraint]()
+    private var screenHeight: CGFloat {
+        return UIScreen.main.bounds.height
+    }
+    var currentState: Bool = false
+    private var toolBarYPos: CGFloat {
+        if currentState == false {
+            return screenHeight
+        }
+            // Ideally check for other states here, but since we only have two, keep it
+            // simple; would do something like: else if currentState == .edit {
+        else {
+            return screenHeight - toolBar.frame.height
+        }
+    }
     
-    @IBOutlet weak var searchBar: UISearchBar!
+    //MARK: - IBOutlet
     @IBOutlet weak var chatTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+     
+        
 
+        navigationController!.isToolbarHidden = true
+        
+        view.addSubview(toolBar)
+        toolBar.translatesAutoresizingMaskIntoConstraints = false
+        toolBarConstraints.append(contentsOf: [
+            toolBar.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+            toolBar.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+            toolBar.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            toolBar.topAnchor.constraint(equalTo: (navigationController?.tabBarController?.tabBar.topAnchor)!)
+            ])
         
         
-        UINavigationBar.appearance().shadowImage = UIImage()
-        UINavigationBar.appearance().setBackgroundImage(UIImage(),for:.default)
+        self.definesPresentationContext = true
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+
         
         //Retrieve the data from DB
         
@@ -63,7 +96,6 @@ class ChatsTableViewController: UIViewController, UITableViewDelegate, UITableVi
         //TODO: Set yourself as the delegate and datasource here:
         chatTableView.delegate = self
         chatTableView.dataSource = self
-        searchBar.delegate = self
 
         
         //TODO: Register your ChatCell.xib file here:
@@ -144,52 +176,51 @@ class ChatsTableViewController: UIViewController, UITableViewDelegate, UITableVi
         self.chatTableView.reloadData()
     }
  
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
     
     
+    @IBAction func onEditBtnTouchUp(_ sender: UIBarButtonItem) {
+        
+        // Switch to the editing mode
+        if currentState == false {
+            currentState = true
+
+           // fade(navigationController?.tabBarController?.tabBar, toAlpha: 0, withDuration: 0.2, andHide: true)
+            UIView.animate(withDuration: 0.2, animations: {
+                // Set edit to done
+                self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self,
+                                                                        action: #selector(self.onDoneBtnTouchUp))
+                // Fade away + btn
+//                self.plusBtn.isEnabled = false
+//                self.plusBtn.tintColor = UIColor.clear
+                
+                // Position the toolbar
+                self.toolBar.frame.origin.y = self.toolBarYPos
+            })
+        }
+        
+    }
+    
+    @objc func onDoneBtnTouchUp(_ sender: Any) {
+        // Switch to normal state
+        if currentState == true {
+            currentState = false
+
+//            fade(tabBar, toAlpha: 1, withDuration: 0.2, andHide: false)
+            UIView.animate(withDuration: 0.2, animations: {
+                // Set edit to done
+                self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self,
+                                                                        action: #selector(self.onEditBtnTouchUp))
+                
+                // Fade in + btn
+//                self.plusBtn.isEnabled = true
+//                self.plusBtn.tintColor = nil
+                
+                // Position the toolbar
+                self.toolBar.frame.origin.y = self.toolBarYPos
+            })
+        }
+ 
+    
+    }
 
 }
